@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Position Sizing Calculator</title>
+    <style>
+        :root {
+            --orange: #ff4170;
+            --dark-orange: #cf5a00;
+            --yellow: #ffb40c;
+            --bg-gradient: linear-gradient(45deg, #fff3e6, #ffe4b3);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+        }
+
+        .calculator-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            display: none;
+        }
+
+        .calculator.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--dark-orange);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-orange);
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--orange);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--yellow);
+            box-shadow: 0 0 0 3px rgba(255, 180, 12, 0.2);
+        }
+
+        button.calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        button.calculate-btn:hover {
+            background: var(--dark-orange);
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--yellow);
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .highlight {
+            font-size: 1.5em;
+            color: var(--dark-orange);
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stock Position Sizing Calculator</h1>
+    
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="showCalculator(1)">Scenario 1: Fixed Risk</button>
+        <button class="tab-btn" onclick="showCalculator(2)">Scenario 2: Dynamic Risk</button>
+    </div>
+
+    <div class="calculator-container">
+        <!-- Scenario 1 Calculator -->
+        <div id="calculator1" class="calculator active">
+            <h2>Fixed Risk Calculator</h2>
+            <div class="input-group">
+                <label>Total Capital ($)</label>
+                <input type="number" id="capital1" placeholder="Enter total capital">
+            </div>
+            <div class="input-group">
+                <label>Risk Percentage (%)</label>
+                <input type="number" id="risk1" placeholder="Enter risk percentage" step="0.1">
+            </div>
+            <div class="input-group">
+                <label>Stock Price ($)</label>
+                <input type="number" id="price1" placeholder="Enter current price" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Stop Loss Percentage (%)</label>
+                <input type="number" id="stoploss-percent" placeholder="Enter stop loss %" step="0.1">
+            </div>
+            <button class="calculate-btn" onclick="calculateScenario1()">Calculate</button>
+            <div class="result">
+                <div>Number of Stocks</div>
+                <div class="highlight" id="stocks-result1">0</div>
+                <div>Stop Loss Price</div>
+                <div class="highlight" id="stoploss-price">$0</div>
+            </div>
+        </div>
+
+        <!-- Scenario 2 Calculator -->
+        <div id="calculator2" class="calculator">
+            <h2>Dynamic Risk Calculator</h2>
+            <div class="input-group">
+                <label>Total Capital ($)</label>
+                <input type="number" id="capital2" placeholder="Enter total capital">
+            </div>
+            <div class="input-group">
+                <label>Entry Price ($)</label>
+                <input type="number" id="entry-price" placeholder="Enter entry price" step="0.01">
+            </div>
+            <div class="input-group">
+                <label>Stop Loss Price ($)</label>
+                <input type="number" id="stoploss-price2" placeholder="Enter stop loss price" step="0.01">
+            </div>
+            <button class="calculate-btn" onclick="calculateScenario2()">Calculate</button>
+            <div class="result">
+                <div>Number of Stocks</div>
+                <div class="highlight" id="stocks-result2">0</div>
+                <div>Risk Percentage</div>
+                <div class="highlight" id="risk-percent">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCalculator(scenario) {
+            document.querySelectorAll('.calculator').forEach(calc => calc.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`calculator${scenario}`).classList.add('active');
+            document.querySelector(`.tab-buttons button:nth-child(${scenario})`).classList.add('active');
+        }
+
+        function calculateScenario1() {
+            const capital = parseFloat(document.getElementById('capital1').value);
+            const riskPercent = parseFloat(document.getElementById('risk1').value) / 100;
+            const price = parseFloat(document.getElementById('price1').value);
+            const stoplossPercent = parseFloat(document.getElementById('stoploss-percent').value) / 100;
+
+            const stoplossPrice = price * (1 - stoplossPercent);
+            const riskPerShare = price - stoplossPrice;
+            const positionSize = capital * riskPercent;
+            const numberOfStocks = Math.floor(positionSize / riskPerShare);
+
+            document.getElementById('stocks-result1').textContent = numberOfStocks;
+            document.getElementById('stoploss-price').textContent = `$${stoplossPrice.toFixed(2)}`;
+        }
+
+        function calculateScenario2() {
+            const capital = parseFloat(document.getElementById('capital2').value);
+            const entryPrice = parseFloat(document.getElementById('entry-price').value);
+            const stoplossPrice = parseFloat(document.getElementById('stoploss-price2').value);
+
+            const riskPerShare = entryPrice - stoplossPrice;
+            const numberOfStocks = Math.floor(capital / entryPrice);
+            const totalRisk = numberOfStocks * riskPerShare;
+            const riskPercent = (totalRisk / capital) * 100;
+
+            document.getElementById('stocks-result2').textContent = numberOfStocks;
+            document.getElementById('risk-percent').textContent = `${riskPercent.toFixed(2)}%`;
+        }
+    </script>
+</body>
+</html>
