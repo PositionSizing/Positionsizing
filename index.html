@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Position Sizing Calculator</title>
     <style>
+        /* Previous CSS remains unchanged */
         :root {
             --orange: #ff4170;
             --dark-orange: #cf5a00;
@@ -23,27 +24,6 @@
             align-items: center;
         }
 
-        .tab-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .tab-btn {
-            padding: 12px 30px;
-            background: var(--orange);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background: var(--dark-orange);
-            transform: translateY(-2px);
-        }
-
         .calculator-container {
             display: flex;
             gap: 2rem;
@@ -57,12 +37,26 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             padding: 2rem;
             width: 100%;
-            max-width: 400px;
-            display: none;
+            max-width: 800px; /* Increased max-width */
+            display: flex;
+            gap: 2rem;
         }
 
-        .calculator.active {
-            display: block;
+        .calculator-content {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .input-section {
+            flex: 1;
+        }
+
+        .result-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         h2 {
@@ -116,120 +110,108 @@
         }
 
         .result {
-            margin-top: 2rem;
             padding: 1.5rem;
             background: var(--yellow);
             border-radius: 8px;
             color: white;
-            text-align: center;
-            font-size: 1.2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .highlight {
             font-size: 1.5em;
             color: var(--dark-orange);
             font-weight: bold;
-            margin-top: 0.5rem;
+            margin: 0.5rem 0 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-content {
+                flex-direction: column;
+            }
+            
+            .calculator {
+                max-width: 400px;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Stock Position Sizing Calculator</h1>
     
-    <div class="tab-buttons">
-        <button class="tab-btn active" onclick="showCalculator(1)">Scenario 1: Fixed Risk</button>
-        <button class="tab-btn" onclick="showCalculator(2)">Scenario 2: Dynamic Risk</button>
-    </div>
-
     <div class="calculator-container">
-        <!-- Scenario 1 Calculator -->
-        <div id="calculator1" class="calculator active">
-            <h2>Fixed Risk Calculator</h2>
-            <div class="input-group">
-                <label>Total Capital ($)</label>
-                <input type="number" id="capital1" placeholder="Enter total capital">
-            </div>
-            <div class="input-group">
-                <label>Risk Percentage (%)</label>
-                <input type="number" id="risk1" placeholder="Enter risk percentage" step="0.1">
-            </div>
-            <div class="input-group">
-                <label>Stock Price ($)</label>
-                <input type="number" id="price1" placeholder="Enter current price" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Stop Loss Percentage (%)</label>
-                <input type="number" id="stoploss-percent" placeholder="Enter stop loss %" step="0.1">
-            </div>
-            <button class="calculate-btn" onclick="calculateScenario1()">Calculate</button>
-            <div class="result">
-                <div>Number of Stocks</div>
-                <div class="highlight" id="stocks-result1">0</div>
-                <div>Stop Loss Price</div>
-                <div class="highlight" id="stoploss-price">$0</div>
-            </div>
-        </div>
+        <div class="calculator">
+            <div class="calculator-content">
+                <div class="input-section">
+                    <h2>Fixed Risk Calculator</h2>
+                    <div class="input-group">
+                        <label>Total Capital ($)</label>
+                        <input type="number" id="capital1" placeholder="Enter total capital">
+                    </div>
+                    <div class="input-group">
+                        <label>Risk Percentage (%)</label>
+                        <input type="number" id="risk1" placeholder="Enter risk percentage" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Stock Price ($)</label>
+                        <input type="number" id="price1" placeholder="Enter current price" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>Stop Loss Percentage (%)</label>
+                        <input type="number" id="stoploss-percent" placeholder="Enter stop loss %" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Take Profit Percentage (%)</label>
+                        <input type="number" id="takeprofit-percent" placeholder="Enter take profit %" step="0.1">
+                    </div>
+                    <button class="calculate-btn" onclick="calculateScenario1()">Calculate</button>
+                </div>
 
-        <!-- Scenario 2 Calculator -->
-        <div id="calculator2" class="calculator">
-            <h2>Dynamic Risk Calculator</h2>
-            <div class="input-group">
-                <label>Total Capital ($)</label>
-                <input type="number" id="capital2" placeholder="Enter total capital">
-            </div>
-            <div class="input-group">
-                <label>Entry Price ($)</label>
-                <input type="number" id="entry-price" placeholder="Enter entry price" step="0.01">
-            </div>
-            <div class="input-group">
-                <label>Stop Loss Price ($)</label>
-                <input type="number" id="stoploss-price2" placeholder="Enter stop loss price" step="0.01">
-            </div>
-            <button class="calculate-btn" onclick="calculateScenario2()">Calculate</button>
-            <div class="result">
-                <div>Number of Stocks</div>
-                <div class="highlight" id="stocks-result2">0</div>
-                <div>Risk Percentage</div>
-                <div class="highlight" id="risk-percent">0%</div>
+                <div class="result-section">
+                    <div class="result">
+                        <div>Number of Stocks</div>
+                        <div class="highlight" id="stocks-result1">0</div>
+                        <div>Stop Loss Price</div>
+                        <div class="highlight" id="stoploss-price">$0</div>
+                        <div>Take Profit Price</div>
+                        <div class="highlight" id="takeprofit-price">$0</div>
+                        <div>Risk/Reward Ratio</div>
+                        <div class="highlight" id="risk-reward">0</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function showCalculator(scenario) {
-            document.querySelectorAll('.calculator').forEach(calc => calc.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`calculator${scenario}`).classList.add('active');
-            document.querySelector(`.tab-buttons button:nth-child(${scenario})`).classList.add('active');
-        }
-
         function calculateScenario1() {
+            // Get input values
             const capital = parseFloat(document.getElementById('capital1').value);
             const riskPercent = parseFloat(document.getElementById('risk1').value) / 100;
             const price = parseFloat(document.getElementById('price1').value);
             const stoplossPercent = parseFloat(document.getElementById('stoploss-percent').value) / 100;
+            const takeprofitPercent = parseFloat(document.getElementById('takeprofit-percent').value) / 100;
 
+            // Calculate prices
             const stoplossPrice = price * (1 - stoplossPercent);
+            const takeprofitPrice = price * (1 + takeprofitPercent);
+            
+            // Calculate position sizing
             const riskPerShare = price - stoplossPrice;
             const positionSize = capital * riskPercent;
             const numberOfStocks = Math.floor(positionSize / riskPerShare);
 
+            // Calculate risk/reward ratio
+            const rewardPerShare = takeprofitPrice - price;
+            const riskRewardRatio = (rewardPerShare / riskPerShare).toFixed(1);
+
+            // Update results
             document.getElementById('stocks-result1').textContent = numberOfStocks;
             document.getElementById('stoploss-price').textContent = `$${stoplossPrice.toFixed(2)}`;
-        }
-
-        function calculateScenario2() {
-            const capital = parseFloat(document.getElementById('capital2').value);
-            const entryPrice = parseFloat(document.getElementById('entry-price').value);
-            const stoplossPrice = parseFloat(document.getElementById('stoploss-price2').value);
-
-            const riskPerShare = entryPrice - stoplossPrice;
-            const numberOfStocks = Math.floor(capital / entryPrice);
-            const totalRisk = numberOfStocks * riskPerShare;
-            const riskPercent = (totalRisk / capital) * 100;
-
-            document.getElementById('stocks-result2').textContent = numberOfStocks;
-            document.getElementById('risk-percent').textContent = `${riskPercent.toFixed(2)}%`;
+            document.getElementById('takeprofit-price').textContent = `$${takeprofitPrice.toFixed(2)}`;
+            document.getElementById('risk-reward').textContent = `1:${riskRewardRatio}`;
         }
     </script>
 </body>
